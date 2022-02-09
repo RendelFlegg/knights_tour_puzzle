@@ -16,6 +16,7 @@ class KnightGame:
         self.move = ' ' * (self.cell_size - 1) + 'O'
         self.moves = list(itertools.product(['+1', '-1'], ['+2', '-2'])) + \
                      list(itertools.product(['+2', '-2'], ['+1', '-1']))
+        self.visited = []
 
     def create_board(self):
         for x in range(1, self.columns + 1):
@@ -61,21 +62,27 @@ class KnightGame:
                 x, y = user_input.split()
                 self.position = '-'.join([str(x), str(y)])
                 self.board[self.position] = self.knight
+                self.visited.append(self.position)
                 break
             else:
                 print('Invalid dimensions!')
 
-    def get_moves(self):
+    def get_moves_list(self, position):
         moves_list = []
-        knight_x, knight_y = self.position.split('-')
+        knight_x, knight_y = position.split('-')
         for move in self.moves:
             possible_x = int(knight_x) + int(move[0])
             possible_y = int(knight_y) + int(move[1])
             possible_move = f'{possible_x} {possible_y}'
             if self.check_move(possible_move):
                 moves_list.append(f'{possible_x}-{possible_y}')
-        for move in moves_list:
-            self.board[move] = self.move
+        return moves_list
+
+    def get_moves(self):
+        for move in self.get_moves_list(self.position):
+            clear_moves = [n for n in self.get_moves_list(move) if n not in self.visited]
+            move_counter = ' ' * (self.cell_size - 1) + str(len(clear_moves))
+            self.board[move] = move_counter
 
 
 def get_dimensions():
